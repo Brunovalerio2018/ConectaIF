@@ -56,7 +56,8 @@ export default function TabRoutes(){
             component={Perfil}
             options={{tabBarIcon: () => <Feather name="home"/>}}
             />
-       
+
+            
 
 
 
