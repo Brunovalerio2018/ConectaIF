@@ -1,111 +1,168 @@
-import React, { useState } from "react";
-import { StyleSheet, Text, View, TextInput, TouchableOpacity, Image, Alert } from "react-native";
-import { StatusBar } from "expo-status-bar";
-import { useNavigation } from '@react-navigation/native'; 
+import React, { useState, useRef } from 'react';
+import { View, Text, TextInput, TouchableOpacity, Image, Animated, StyleSheet } from 'react-native';
+import { useNavigation } from '@react-navigation/native'; // Importando useNavigation
+import RecuperarConta from './RecuperarConta';
 
-
-export default function Login() {
-  
-  const navigation = useNavigation(); 
+const LoginHome = () => {
+  const navigation = useNavigation(); // Obtendo a navegação
   const [usuario, setUsuario] = useState('');
   const [senha, setSenha] = useState('');
+  const [mostrarSenha, setMostrarSenha] = useState(false);
+  const opacityAnim = useRef(new Animated.Value(1)).current;
 
+  const toggleMostrarSenha = () => {
+    setMostrarSenha(!mostrarSenha);
+  };
 
-  const handleLogin = () => {
-    if (usuario === "" || senha === "") {
-      Alert.alert("Erro", "Usuário e senha são obrigatórios!");
-      return;
-    }
+  const handlePress = () => {
+    Animated.sequence([
+      Animated.timing(opacityAnim, {
+        toValue: 0.5,
+        duration: 100,
+        useNativeDriver: true,
+      }),
+      Animated.timing(opacityAnim, {
+        toValue: 1,
+        duration: 100,
+        useNativeDriver: true,
+      }),
+      Animated.timing(opacityAnim, {
+        toValue: 0.5,
+        duration: 100,
+        useNativeDriver: true,
+      }),
+      Animated.timing(opacityAnim, {
+        toValue: 1,
+        duration: 100,
+        useNativeDriver: true,
+      }),
+    ]).start();
 
-    try {
-      navigation.replace('Main');  
-    } catch (error) {
-
-      Alert.alert("Erro de navegação", "Ocorreu um erro ao tentar navegar para a tela principal.");
-      console.error("Erro na navegação:", error);  // Para fins de depuração
-    }
+    console.log('Acessar Pressed');
   };
 
   return (
     <View style={styles.container}>
-      <StatusBar style="auto" />
-      <Image source={require('./assets/logo-if.png')} style={styles.logo} />
-      <Text style={styles.title}>Login ConnectaIF</Text>
-      
+      <View style={styles.logoContainer}>
+        <Image 
+          source={require('../../../assets/Logo_ifsul_ConectaIF.png')}
+          style={styles.logo}
+          resizeMode="contain"
+        />
+      </View>
+
+      <Text style={styles.title}>Login ConectaIF</Text>
+
+      <Text style={styles.label}>Usuário:</Text>
       <TextInput
         style={styles.input}
-        placeholder="Usuário"
-        placeholderTextColor="#a6a6a6"
+        placeholder="Nome de usuário"
         value={usuario}
-        onChangeText={setUsuario}  
+        onChangeText={setUsuario}
       />
-      
+
+      <Text style={styles.label}>Senha:</Text>
       <TextInput
         style={styles.input}
-        placeholder="Senha"
-        placeholderTextColor="#a6a6a6"
-        secureTextEntry
+        placeholder="Digite sua senha"
+        secureTextEntry={!mostrarSenha}
         value={senha}
-        onChangeText={setSenha}  
+        onChangeText={setSenha}
       />
 
-      <TouchableOpacity style={styles.button} onPress={handleLogin}>
-        <Text style={styles.buttonText}>Acessar</Text>
-      </TouchableOpacity>
+      <View style={styles.optionsContainer}>
+        <TouchableOpacity onPress={toggleMostrarSenha}>
+          <Text style={styles.optionText}>{mostrarSenha ? 'Ocultar a senha' : 'Exibir a senha'}</Text>
+        </TouchableOpacity>
+        
+        <TouchableOpacity onPress={() => navigation.navigate('RecuperarConta')}>
+          <Text style={styles.optionText}>Esqueceu ou deseja alterar sua senha?</Text>
+        </TouchableOpacity>
+      </View>
 
-      <TouchableOpacity>
-        <Text style={styles.forgotPassword}>Esqueceu ou deseja alterar sua senha?</Text>
-      </TouchableOpacity>
+      <Animated.View style={{ opacity: opacityAnim }}>
+        <TouchableOpacity 
+          style={styles.neonButton} 
+          onPress={handlePress}
+          activeOpacity={0.8}
+        >
+          <Text style={styles.buttonText}>Acessar</Text>
+        </TouchableOpacity>
+      </Animated.View>
     </View>
   );
-}
+};
+
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
     justifyContent: 'center',
-    padding: 20,
+    paddingHorizontal: 50,
+    backgroundColor: '#ffffff',
+  },
+  logoContainer: {
+    alignItems: 'center',
+    marginBottom: -120,
   },
   logo: {
-    width: 200,
-    height: 80,
-    resizeMode: 'contain',
-    marginBottom: 40,
+    width: 600,
+    height: 600,
   },
   title: {
-    fontSize: 18,
+    fontSize: 22,
     marginBottom: 20,
+    textAlign: 'center',
+    color: '#000',
+  },
+  label: {
+    fontSize: 10,
+    marginBottom: 5,
     color: '#333',
   },
   input: {
-    width: '100%',
-    height: 50,
-    backgroundColor: '#f2f2f2',
-    borderRadius: 8,
-    paddingHorizontal: 10,
-    marginBottom: 20,
-    fontSize: 16,
+    borderWidth: 1,
+    borderColor: '#ccc',
+    padding: 5,
+    marginBottom: 15,
+    borderRadius: 10,
+    backgroundColor: '#eaeaea',
   },
-  button: {
-    width: '100%',
-    height: 50,
-    backgroundColor: '#006400',
-    borderRadius: 8,
+  optionsContainer: {
+    flexDirection: 'column',
+    marginBottom: 5,
     alignItems: 'center',
+
+  },
+  optionText: {
+    color: '#0066cc',
+    marginBottom: 15,
+  },
+  neonButton: {
+    backgroundColor: '#359830',
+    paddingVertical: 5,
+    paddingHorizontal: 0,
+    paddingStart: 0,
+    borderRadius: 10,
+    shadowColor: '#00ff00',
+    shadowOffset: { width: 6, height: 6 },
+    shadowOpacity: 0.10,
+    shadowRadius: 10, // Diminua esse valor para menos brilho ao redor
+    elevation: 10, // Pode diminuir também a elevação
     justifyContent: 'center',
-    marginBottom: 20,
+    marginVertical: 5,
+    borderWidth: 2, // Diminua esse valor para uma borda mais fina
+    borderColor: '#00ff00',
   },
   buttonText: {
-    color: '#fff',
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
-  forgotPassword: {
-    color: '#006400',
     fontSize: 14,
-    textDecorationLine: 'underline',
+    color: '#ffffff',
+    fontWeight: 'bold',
+    textAlign: 'center',
   },
 });
 
+export default LoginHome;
+
+
+/* codigo cor original verde ifsul #359830 */
