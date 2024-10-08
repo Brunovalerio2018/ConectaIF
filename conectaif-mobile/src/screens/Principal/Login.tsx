@@ -1,18 +1,18 @@
-import React, { useState, useRef } from 'react';
-import { View, Text, TextInput, TouchableOpacity, Image, Animated, StyleSheet } from 'react-native';
-import { useNavigation } from '@react-navigation/native'; // Importando useNavigation
-import RecuperarConta from './RecuperarConta';
+import   React, { useState, useRef }                                              from 'react';
+import { View, Text, TextInput, TouchableOpacity, Image, Animated, StyleSheet }   from 'react-native';
+import   RecuperarConta                                                           from './RecuperarConta';
 
 const LoginHome = () => {
-  const navigation = useNavigation(); // Obtendo a navegação
   const [usuario, setUsuario] = useState('');
   const [senha, setSenha] = useState('');
   const [mostrarSenha, setMostrarSenha] = useState(false);
   const opacityAnim = useRef(new Animated.Value(1)).current;
 
+
   const toggleMostrarSenha = () => {
     setMostrarSenha(!mostrarSenha);
   };
+  
 
   const handlePress = () => {
     Animated.sequence([
@@ -75,7 +75,10 @@ const LoginHome = () => {
           <Text style={styles.optionText}>{mostrarSenha ? 'Ocultar a senha' : 'Exibir a senha'}</Text>
         </TouchableOpacity>
         
-        <TouchableOpacity onPress={() => navigation.navigate('RecuperarConta')}>
+        {/* Espaço adicionado entre as opções */}
+        <View style={styles.spaceBetweenOptions} />
+        
+        <TouchableOpacity onPress={RecuperarConta}>
           <Text style={styles.optionText}>Esqueceu ou deseja alterar sua senha?</Text>
         </TouchableOpacity>
       </View>
@@ -98,60 +101,62 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
-    paddingHorizontal: 50,
+    alignItems: 'center', // Centraliza horizontalmente
     backgroundColor: '#ffffff',
   },
   logoContainer: {
     alignItems: 'center',
-    marginBottom: -120,
+    marginBottom: -10, // Aumentei a aproximação do título em relação ao logo
   },
   logo: {
-    width: 600,
-    height: 600,
+    width: 1000, // Ajuste a largura da logo para melhor proporção
+    height:550, // Ajuste a altura da logo para melhor proporção
   },
   title: {
-    fontSize: 22,
-    marginBottom: 20,
+    fontSize: 25,
+    marginBottom: 10, // Diminuí a margem inferior para aproximar o título do logo
     textAlign: 'center',
     color: '#000',
   },
   label: {
-    fontSize: 10,
-    marginBottom: 5,
+    fontSize: 20,
+    marginBottom: 10,
     color: '#333',
   },
   input: {
-    borderWidth: 1,
+    borderWidth: 2,
     borderColor: '#ccc',
     padding: 5,
-    marginBottom: 15,
+    marginBottom: 10,
     borderRadius: 10,
     backgroundColor: '#eaeaea',
+    width: '100%', // Faz com que o campo de entrada ocupe toda a largura disponível
+    maxWidth: 300, // Limita a largura máxima para manter a proporção
   },
   optionsContainer: {
     flexDirection: 'column',
-    marginBottom: 5,
     alignItems: 'center',
-
+  },
+  spaceBetweenOptions: {
+    height: 20, // Altura do espaço entre as opções
   },
   optionText: {
     color: '#0066cc',
-    marginBottom: 15,
+    marginBottom: -10,
   },
   neonButton: {
     backgroundColor: '#359830',
-    paddingVertical: 5,
-    paddingHorizontal: 0,
-    paddingStart: 0,
-    borderRadius: 10,
+    paddingVertical: 8,
+    paddingHorizontal: 50,
+    borderRadius: 25,
     shadowColor: '#00ff00',
-    shadowOffset: { width: 6, height: 6 },
-    shadowOpacity: 0.10,
-    shadowRadius: 10, // Diminua esse valor para menos brilho ao redor
-    elevation: 10, // Pode diminuir também a elevação
+    shadowOffset: { width: 0.10, height: 10 },
+    shadowOpacity: 20,
+    shadowRadius: 20,
+    elevation: 30,
     justifyContent: 'center',
-    marginVertical: 5,
-    borderWidth: 2, // Diminua esse valor para uma borda mais fina
+    marginVertical: 40,
+    borderWidth: 2,
     borderColor: '#00ff00',
   },
   buttonText: {
@@ -164,5 +169,4 @@ const styles = StyleSheet.create({
 
 export default LoginHome;
 
-
-/* codigo cor original verde ifsul #359830 */
+/* código cor original verde ifsul #359830 */
