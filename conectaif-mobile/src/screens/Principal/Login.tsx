@@ -1,124 +1,120 @@
-import React, { useState, useRef } from 'react';
-import { View, Text, TextInput, TouchableOpacity, Image, Animated, StyleSheet } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import api from '../../app';
+import React, { useState } from 'react';
+import { View, Text, TextInput, TouchableOpacity, Image, StyleSheet } from 'react-native' 
+import {auth, firebase} from '../../../firebase'
 
-const LoginHome = () => {
-  const [usuario, setUsuario] = useState('');
+
+const CadastroAluno = () => {
+  const [matricula, setMatricula] = useState('');
+  const [nome, setNome] = useState('');
+  const [responsavel, setResponsavel] = useState('');
+  const [nascimento, setNascimento] = useState('');
+  const [telefone, setTelefone] = useState('');
   const [senha, setSenha] = useState('');
-  const [mostrarSenha, setMostrarSenha] = useState(false);
-  const opacityAnim = useRef(new Animated.Value(1)).current;
-  const navigation = useNavigation();
+  const [status, setStatus] = useState('Ativo'); // Valor padrão "Ativo"
+  const handleCadastro = async () => {
+    console.log('Aluno Cadastrado');
+    console.log('Matrícula:', matricula);
+    console.log('Nome:', nome);
+    console.log('Responsável:', responsavel);
+    console.log('Nascimento:', nascimento);
+    console.log('Telefone:', telefone);
+    console.log('Senha:', senha);
+    console.log('Status:', status);
 
-  const toggleMostrarSenha = () => {
-    setMostrarSenha(!mostrarSenha);
-  };
 
-  const handlePress = async () => {
-    const result = await api.post('autorizacao/login', { login: usuario, senha: senha });
-    console.log(result.data);
-
-    Animated.sequence([
-      Animated.timing(opacityAnim, {
-        toValue: 0.5,
-        duration: 100,
-        useNativeDriver: true,
-      }),
-      Animated.timing(opacityAnim, {
-        toValue: 1,
-        duration: 100,
-        useNativeDriver: true,
-      }),
-      Animated.timing(opacityAnim, {
-        toValue: 0.5,
-        duration: 100,
-        useNativeDriver: true,
-      }),
-      Animated.timing(opacityAnim, {
-        toValue: 1,
-        duration: 100,
-        useNativeDriver: true,
-      }),
-    ]).start();
-
-    console.log('Acessar Pressed');
-  };
-
-  const handleRecuperarSenha = () => {
-    navigation.navigate('RecuperarConta');
-  };
-
-  const telaCadastro = () => {
-    navigation.navigate('CadastroAluno');
+  
+    const calcularIdade = (dataNascimento: string) => {
+      const nascimentoDate = new Date(dataNascimento);
+      const hoje = new Date();
+      const idade = hoje.getFullYear() - nascimentoDate.getFullYear();
+      const mes = hoje.getMonth() - nascimentoDate.getMonth();
+      if (mes < 0 || (mes === 0 && hoje.getDate() < nascimentoDate.getDate())) {
+        return idade - 1;
+      }
+      return idade;
+    };
+  
+    const idadeAluno = calcularIdade(nascimento);
+  
+    try {
+      // Validação se o aluno é menor de idade
+      if (idadeAluno < 18 && !responsavel) {
+        alert('Por favor, insira o nome do responsável prosseguir com o cadastro.');
+        return; // Impede o cadastro se o responsável não for informado
+      }
+  
+      // Se tudo estiver certo, criar o usuário no Firebase Authentication
+      const CadCredential = await createUserWithEmailAndPassword(auth, matricula, senha);
+      console.log('Aluno cadastrado com sucesso:', CadCredential.user);
+  
+      // Aqui você pode salvar as demais informações do aluno no Firestore ou outro banco
+    } catch (error) {
+      console.error('Erro ao cadastrar aluno:', error.message);
+    }
   };
 
   return (
     <View style={styles.container}>
       <View style={styles.logoContainer}>
-        <Image
+        <Image 
           source={require('../../../assets/ProjetoConnectaIF_Logo_ConectaIF_ColoridoNew.png')}
           style={styles.logo}
           resizeMode="contain"
         />
       </View>
 
-      <Text style={styles.title}>Login ConectaIF</Text>
+      <Text style={styles.title}>Cadastro de Aluno</Text>
 
-      <Text style={styles.label1}>Usuário:</Text>
       <TextInput
         style={styles.input}
-        placeholder="Nome de usuário"
-        value={usuario}
-        onChangeText={setUsuario}
+        placeholder="    Email (Matrícula)"
+        value={matricula}
+        onChangeText={setMatricula}
       />
-
-      <Text style={styles.label2}>Senha:</Text>
       <TextInput
         style={styles.input}
-        placeholder="Digite sua senha"
-        secureTextEntry={!mostrarSenha}
+        placeholder="    Nome"
+        value={nome}
+        onChangeText={setNome}
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="    Responsável (apenas menores)"
+        value={responsavel}
+        onChangeText={setResponsavel}
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="    Data de Nascimento"
+        value={nascimento}
+        onChangeText={setNascimento}
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="    Telefone"
+        value={telefone}
+        onChangeText={setTelefone}
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="    Senha"
+        secureTextEntry
         value={senha}
         onChangeText={setSenha}
       />
 
-      <View style={styles.optionsContainer}>
-        <TouchableOpacity onPress={toggleMostrarSenha}>
-          <Text style={styles.optionText}>
-            {mostrarSenha ? 'Ocultar a senha' : 'Exibir a senha'}
-          </Text>
-        </TouchableOpacity>
+      <Text style={styles.label}>Status:</Text>
+      <TouchableOpacity
+        style={styles.statusButton}
+        onPress={() => setStatus(status === 'Ativo' ? 'Inativo' : 'Ativo')}
+      >
+        <Text style={styles.statusText}>{status}</Text>
+      </TouchableOpacity>
 
-        <View style={styles.spaceBetweenOptions} />
-
-        <TouchableOpacity onPress={handleRecuperarSenha}>
-          <Text style={styles.optionText}>
-            Esqueceu ou deseja alterar sua senha?
-          </Text>
-        </TouchableOpacity>
-      </View>
-
-      <Animated.View style={{ opacity: opacityAnim }}>
-        <View style={styles.buttonContainerAcess}>
-          <TouchableOpacity
-            style={styles.neonButton}
-            onPress={handlePress}
-            activeOpacity={0.8}
-          >
-            <Text style={styles.buttonText}>Acessar</Text>
-          </TouchableOpacity>
-          </View>  
-          <View style={styles.buttonContainerCad}>
-          <TouchableOpacity
-            style={styles.cadastroButton}
-            onPress={telaCadastro}
-          >
-            <Text style={styles.cadastroButtonText}>Cadastrar-se</Text>
-          </TouchableOpacity>
-        </View>
-      </Animated.View>
-
-
-      <Text style={styles.watermark}>SISTEMA UNIFICADO CONECTAIF</Text>
+      {/* Remover margem inferior do botão de status */}
+      <TouchableOpacity style={styles.neonButton} onPress={handleCadastro}>
+        <Text style={styles.buttonText}>Cadastrar Aluno</Text>
+      </TouchableOpacity>
     </View>
   );
 };
@@ -127,107 +123,75 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
-    alignItems: 'center',
+    padding: 20,
     backgroundColor: '#ffffff',
   },
   logoContainer: {
     alignItems: 'center',
-    marginBottom: -70,
+    marginBottom: -100,
   },
   logo: {
     width: 1000,
     height: 550,
   },
   title: {
-    fontSize: 25,
+    fontSize: 22,
     marginBottom: 20,
     textAlign: 'center',
     color: '#000',
   },
-  label1: {
-    fontSize: 15,
-    marginBottom: 5,
-    marginLeft: -220,
-    color: '#333',
-  },
-  label2: {
-    fontSize: 15,
-    marginBottom: 5,
-    borderTopLeftRadius: 20,
-    marginLeft: -229,
-  },
   input: {
     borderWidth: 1,
     borderColor: '#ccc',
-    padding: 5,
-    marginBottom: 5,
-    borderRadius: 5,
+    padding: 0,
+    marginBottom: 10,
+    borderRadius: 10,
     backgroundColor: '#eaeaea',
-    width: '66%',
-    maxWidth: 388,
+    width: '85%',
+    alignSelf: 'center',
   },
-  optionsContainer: {
-    flexDirection: 'column',
+  label: {
+    fontSize: 16,
+    marginBottom: 10,
+    color: '#333',
+    textAlign: 'center',
+  },
+  statusButton: {
+    backgroundColor: '#359830',
+    padding: 10,
+    borderRadius: 20,
+    width: '49%',
+    alignSelf: 'center',
+    marginBottom: 5, // Ajustar a margem inferior
     alignItems: 'center',
+    paddingVertical: 5
   },
-  spaceBetweenOptions: {
-    height: 20,
-  },
-  optionText: {
-    color: '#0066cc',
-    marginBottom: 0,
-  },
-  buttonContainerAcess: {
-    flexDirection: 'row', // Para alinhar os botões lado a lado
-    justifyContent: 'space-between',
-    width: '40%',
-    maxWidth: 200, // Limite a largura total para os botões
-  },
-  buttonContainerCad: {
-    flexDirection: 'row', // Para alinhar os botões lado a lado
-    justifyContent: 'space-between',
-    width: '50%',
-    maxWidth: 200, // Limite a largura total para os botões
+  statusText: {
+    fontSize: 16,
+    color: '#FFFFFF',
   },
   neonButton: {
     backgroundColor: '#359830',
-    borderRadius: 25,
-    shadowOpacity: 0,
-    shadowRadius: 0,
-    elevation: 4,
+    paddingVertical: 5,
+    paddingHorizontal: 40,
+    borderRadius: 20,
+    shadowColor: '#00ff00',
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.0,
+    shadowRadius: 10,
     justifyContent: 'center',
-    marginVertical: 30,
+    marginVertical: 0, // Remover margem vertical
+    borderWidth: 0,
     borderColor: '#00ff00',
-    flex: 1, // O botão de acessar vai ocupar a maior parte do espaço
-    marginRight: 2, // Margem à direita para o espaçamento
+    alignSelf: 'center',
   },
   buttonText: {
-    fontSize: 14,
-    color: '#ffffff',
-    fontWeight: 'bold',
-    textAlign: 'center',
-    
-  },
-  watermark: {
-    top: 20,
-    right: 10,
-    fontSize: 12,
-    color: 'rgba(0, 0, 1, 0.2)',
-  },
-  cadastroButton: {
-    backgroundColor: '#359830',
-    borderRadius:20,
-    flex: 1, // Ajuste o flex para reduzir a largura do botão
-    marginTop: -25,
-  },
-  cadastroButtonText: {
     fontSize: 15,
     color: '#ffffff',
     fontWeight: 'bold',
     textAlign: 'center',
-    marginTop: 1
+    width: '43%',
   },
-  
 });
 
-export default LoginHome;
+export default CadastroAluno;
