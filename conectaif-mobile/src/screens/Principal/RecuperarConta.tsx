@@ -11,7 +11,7 @@ const RecuperarConta = () => {
 
   const handleAvancar = () => {
     console.log('Opção selecionada:', opcaoSelecionada);
-    
+
     console.log('Matrícula ou CPF:', matriculaCpf);
   };
 
@@ -67,7 +67,6 @@ const RecuperarConta = () => {
         </View>
       )}
 
-      {/* Botão de Voltar */}
       <TouchableOpacity 
         style={styles.voltarButton} 
         onPress={handleVoltar} 
@@ -144,22 +143,24 @@ const styles = StyleSheet.create({
     backgroundColor: '#359830',
     paddingVertical: 10,
     paddingHorizontal: 20,
-    borderRadius: 5,
+    borderRadius: 30, // Alterado de 5 para 10
     shadowColor: '#00ff00',
     shadowOffset: { width: 0, height: 0 },
     shadowOpacity: 0.5,
-    shadowRadius: 10,
-    elevation: 5,
+    shadowRadius: 25,
+    elevation: 0,
     justifyContent: 'center',
     marginVertical: 20,
     borderWidth: 2,
     borderColor: '#00ff00',
   },
+
   buttonText: {
     fontSize: 14,
     color: '#ffffff',
     fontWeight: 'bold',
     textAlign: 'center',
+  
   },
   voltarButton: {
     backgroundColor: '#359830',
