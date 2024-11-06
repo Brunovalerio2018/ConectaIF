@@ -2,12 +2,12 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { useNavigation } from '@react-navigation/native'; // Importa o hook de navegação
-import LoginHome from './Login';
+
 
 const RecuperarConta = () => {
   const [opcaoSelecionada, setOpcaoSelecionada] = useState('');
   const [matriculaCpf, setMatriculaCpf] = useState('');
-  const navigation = useNavigation(); // Hook de navegação
+  const navigation = useNavigation();
 
   const handleAvancar = () => {
     console.log('Opção selecionada:', opcaoSelecionada);
@@ -16,14 +16,14 @@ const RecuperarConta = () => {
   };
 
   const handleVoltar = () => {
-    navigation.goBack('LoginHome'); // Função para voltar para a tela anterior
+    navigation.goBack('LoginHome'); 
   };
 
   return (
     <View style={styles.container}>
       <View style={styles.logoContainer}>
         <Image 
-          source={require('../../../assets/ProjetoConnectaIF_Logo_ConectaIF_ColoridoNew.png')}
+          source={require('../../../assets/logoConectaIF.png')}
           style={styles.logo}
           resizeMode="contain"
         />
@@ -36,14 +36,8 @@ const RecuperarConta = () => {
           style={[styles.optionButton, opcaoSelecionada === 'senha' && styles.selectedOption]}
           onPress={() => setOpcaoSelecionada('senha')}
         >
-          <Text style={styles.optionText}>Perdi a senha</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={[styles.optionButton, opcaoSelecionada === 'email' && styles.selectedOption]}
-          onPress={() => setOpcaoSelecionada('email')}
-        >
-          <Text style={styles.optionText}>Perdi o e-mail acadêmico</Text>
+        
+          <Text style={styles.optionText}>Perdi email academico</Text>
         </TouchableOpacity>
       </View>
 
@@ -90,8 +84,8 @@ const styles = StyleSheet.create({
     marginBottom: -10, // Aumenta a aproximação do título em relação ao logo
   },
   logo: {
-    width: 1000, // Ajuste a largura da logo para melhor proporção
-    height: 550, // Ajuste a altura da logo para melhor proporção
+    width: 1000, 
+    height: 550, 
   },
   title: {
     fontSize: 22,
@@ -100,7 +94,8 @@ const styles = StyleSheet.create({
     color: '#000',
   },
   optionsContainer: {
-    marginBottom: 20,
+    marginBottom: 0,
+    marginVertical: 0,
     alignItems: 'center',
   },
   optionButton: {
@@ -142,16 +137,16 @@ const styles = StyleSheet.create({
   neonButton: {
     backgroundColor: '#359830',
     paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 30, // Alterado de 5 para 10
+    paddingHorizontal: 15,
+    borderRadius: 50, // Alterado de 5 para 10
     shadowColor: '#00ff00',
     shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.5,
-    shadowRadius: 25,
+    shadowOpacity: 0,
+    shadowRadius: 20,
     elevation: 0,
     justifyContent: 'center',
-    marginVertical: 20,
-    borderWidth: 2,
+    marginVertical: 10,
+    borderWidth: 0,
     borderColor: '#00ff00',
   },
 
@@ -168,7 +163,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     borderRadius: 20,
     alignSelf: 'center',
-    marginTop: 20,
+    marginTop: 0,
   },
   voltarButtonText: {
     fontSize: 14,
