@@ -28,7 +28,6 @@ const Routes = () => {
           component={TabRoutes} 
           options={{headerShown: false}}
         /> 
-        <Stack.Screen name='Notificacoes' component={Notificacoes} options={{headerShown: false}} />
       </Stack.Navigator>
 
     </NavigationContainer>
