@@ -1,120 +1,132 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, Image, StyleSheet } from 'react-native' 
-import {auth, firebase} from '../../../firebase'
+import React, { useState, useRef } from 'react';
+import { View, Text, TextInput, TouchableOpacity, Image, Animated, StyleSheet, Alert } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
+import api from '../../app';
 
-const CadastroAluno = () => {
-  const [matricula, setMatricula] = useState('');
-  const [nome, setNome] = useState('');
-  const [responsavel, setResponsavel] = useState('');
-  const [nascimento, setNascimento] = useState('');
-  const [telefone, setTelefone] = useState('');
+const LoginHome = () => {
+  const [usuario, setUsuario] = useState('');
   const [senha, setSenha] = useState('');
-  const [status, setStatus] = useState('Ativo'); // Valor padrão "Ativo"
-  const handleCadastro = async () => {
-    console.log('Aluno Cadastrado');
-    console.log('Matrícula:', matricula);
-    console.log('Nome:', nome);
-    console.log('Responsável:', responsavel);
-    console.log('Nascimento:', nascimento);
-    console.log('Telefone:', telefone);
-    console.log('Senha:', senha);
-    console.log('Status:', status);
+  const [mostrarSenha, setMostrarSenha] = useState(false);
+  const opacityAnim = useRef(new Animated.Value(1)).current;
+  const navigation = useNavigation(); 
 
 
-  
-    const calcularIdade = (dataNascimento: string) => {
-      const nascimentoDate = new Date(dataNascimento);
-      const hoje = new Date();
-      const idade = hoje.getFullYear() - nascimentoDate.getFullYear();
-      const mes = hoje.getMonth() - nascimentoDate.getMonth();
-      if (mes < 0 || (mes === 0 && hoje.getDate() < nascimentoDate.getDate())) {
-        return idade - 1;
-      }
-      return idade;
-    };
-  
-    const idadeAluno = calcularIdade(nascimento);
-  
+  const toggleMostrarSenha = () => {
+    setMostrarSenha(!mostrarSenha);
+  };
+
+  const handlePress = async () => {
+    console.log('antes do post');
     try {
-      // Validação se o aluno é menor de idade
-      if (idadeAluno < 18 && !responsavel) {
-        alert('Por favor, insira o nome do responsável prosseguir com o cadastro.');
-        return; // Impede o cadastro se o responsável não for informado
-      }
-  
-      // Se tudo estiver certo, criar o usuário no Firebase Authentication
-      const CadCredential = await createUserWithEmailAndPassword(auth, matricula, senha);
-      console.log('Aluno cadastrado com sucesso:', CadCredential.user);
-  
-      // Aqui você pode salvar as demais informações do aluno no Firestore ou outro banco
+        const retorno = await api.post('autorizacao/login', { login: usuario, senha: senha });
+        console.log(retorno);
+        const token = retorno?.data?.access_token;
+
+        if (token) {
+
+            await AsyncStorage.setItem('userToken', token);
+
+            Animated.sequence([
+                Animated.timing(opacityAnim, {
+                    toValue: 0.5,
+                    duration: 100,
+                    useNativeDriver: true,
+                }),
+                Animated.timing(opacityAnim, {
+                    toValue: 1,
+                    duration: 100,
+                    useNativeDriver: true,
+                }),
+            ]).start();
+
+            Alert.alert("Login bem-sucedido!", "Bem-vindo ao sistema.");
+            navigation.navigate("TabRoutes");
+        } else {
+            Alert.alert("Erro de Login", "Usuário ou senha incorretos.");
+        }
     } catch (error) {
-      console.error('Erro ao cadastrar aluno:', error.message);
+        console.error("Erro ao realizar login: ", error);
+        Alert.alert("Erro de Login", "Houve um problema ao tentar fazer login. Tente novamente.");
     }
+};
+
+const fetchData = async () => {
+  try {
+      const token = await AsyncStorage.getItem('userToken');
+      const response = await api.get('sua-api/protegida', {
+          headers: {
+              Authorization: `Bearer ${token}`,
+          },
+      });
+      // Processar a resposta
+    } catch (error) {
+      console.error("Erro ao buscar dados: ", error);
+  }
+};
+
+  const handleRecuperarSenha = () => {
+    navigation.navigate('RecuperarConta'); 
   };
 
   return (
     <View style={styles.container}>
       <View style={styles.logoContainer}>
-        <Image 
-          source={require('../../../assets/ProjetoConnectaIF_Logo_ConectaIF_ColoridoNew.png')}
+        <Image
+          source={require('../../../assets/logoConectaIF.png')}
           style={styles.logo}
           resizeMode="contain"
         />
       </View>
 
-      <Text style={styles.title}>Cadastro de Aluno</Text>
+      <Text style={styles.title}>Login ConectaIF</Text>
 
+      <Text style={styles.label1}>Usuário:</Text>
       <TextInput
         style={styles.input}
-        placeholder="    Email (Matrícula)"
-        value={matricula}
-        onChangeText={setMatricula}
+        placeholder="Nome de usuário"
+        value={usuario}
+        onChangeText={setUsuario}
       />
+
+      <Text style={styles.label2}>Senha:</Text>
       <TextInput
         style={styles.input}
-        placeholder="    Nome"
-        value={nome}
-        onChangeText={setNome}
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="    Responsável (apenas menores)"
-        value={responsavel}
-        onChangeText={setResponsavel}
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="    Data de Nascimento"
-        value={nascimento}
-        onChangeText={setNascimento}
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="    Telefone"
-        value={telefone}
-        onChangeText={setTelefone}
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="    Senha"
-        secureTextEntry
+        placeholder="Digite sua senha"
+        secureTextEntry={!mostrarSenha}
         value={senha}
         onChangeText={setSenha}
       />
 
-      <Text style={styles.label}>Status:</Text>
-      <TouchableOpacity
-        style={styles.statusButton}
-        onPress={() => setStatus(status === 'Ativo' ? 'Inativo' : 'Ativo')}
-      >
-        <Text style={styles.statusText}>{status}</Text>
-      </TouchableOpacity>
+      <View style={styles.optionsContainer}>
+         <TouchableOpacity onPress={toggleMostrarSenha}>
+                    <Text    style={styles.optionText}>
+                                   {mostrarSenha ? 'Ocultar a senha' : 'Exibir a senha'}
+                   </Text>
+        </TouchableOpacity>
 
-      {/* Remover margem inferior do botão de status */}
-      <TouchableOpacity style={styles.neonButton} onPress={handleCadastro}>
-        <Text style={styles.buttonText}>Cadastrar Aluno</Text>
-      </TouchableOpacity>
+        <View style={styles.spaceBetweenOptions} />
+
+        <TouchableOpacity onPress={handleRecuperarSenha}>
+          <Text style={styles.optionText}>
+            Esqueceu ou deseja alterar sua senha?
+          </Text>
+        </TouchableOpacity>
+      </View>
+
+      <Animated.View style={{ opacity: opacityAnim }}>
+        <TouchableOpacity
+          style={styles.neonButton}
+          onPress={handlePress}
+          activeOpacity={0.8}
+        >
+          <Text style={styles.buttonText}>Acessar</Text>
+        </TouchableOpacity>
+      </Animated.View>
+
+      {/* Adiciona a marca d'água */}
+      <Text style={styles.watermark}>SISTEMA UNIFICADO CONECTAIF</Text>
     </View>
   );
 };
@@ -123,75 +135,84 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
-    padding: 20,
+    alignItems: 'center', // Centraliza horizontalmente
     backgroundColor: '#ffffff',
   },
   logoContainer: {
     alignItems: 'center',
-    marginBottom: -100,
+    marginBottom: -10, // Aumenta a aproximação do título em relação ao logo
   },
   logo: {
-    width: 1000,
-    height: 550,
+    width: 1000, // Ajuste a largura da logo para melhor proporção
+    height: 550, // Ajuste a altura da logo para melhor proporção
   },
   title: {
-    fontSize: 22,
-    marginBottom: 20,
+    fontSize: 25,
+    marginBottom: 10, // Diminuí a margem inferior para aproximar o título do logo
     textAlign: 'center',
     color: '#000',
+  },
+  label1: {
+    fontSize: 20,
+    marginBottom: 0,
+    marginLeft: -220,
+    color: '#333',
+  },
+  label2: {
+    fontSize: 20,
+    marginBottom: 0,
+    borderTopLeftRadius: 20,
+    marginLeft: -229,
   },
   input: {
     borderWidth: 1,
     borderColor: '#ccc',
-    padding: 0,
-    marginBottom: 10,
+    padding: 3,
+    marginBottom: 2,
     borderRadius: 10,
     backgroundColor: '#eaeaea',
-    width: '85%',
-    alignSelf: 'center',
+    width: '100%', // Faz com que o campo de entrada ocupe toda a largura disponível
+    maxWidth: 290, // Limita a largura máxima para manter a proporção
   },
-  label: {
-    fontSize: 16,
-    marginBottom: 10,
-    color: '#333',
-    textAlign: 'center',
-  },
-  statusButton: {
-    backgroundColor: '#359830',
-    padding: 10,
-    borderRadius: 20,
-    width: '49%',
-    alignSelf: 'center',
-    marginBottom: 5, // Ajustar a margem inferior
+  optionsContainer: {
+    flexDirection: 'column',
     alignItems: 'center',
-    paddingVertical: 5
   },
-  statusText: {
-    fontSize: 16,
-    color: '#FFFFFF',
+  spaceBetweenOptions: {
+    height: 25, // Altura do espaço entre as opções
+  },
+  optionText: {
+    color: '#0066cc',
+    marginBottom: -10,
   },
   neonButton: {
     backgroundColor: '#359830',
-    paddingVertical: 5,
-    paddingHorizontal: 40,
-    borderRadius: 20,
+    paddingVertical: 9,
+    paddingHorizontal: 60,
+    borderRadius: 25,
     shadowColor: '#00ff00',
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.0,
+    shadowOffset: { width: 0.10, height: 0 },
+    shadowOpacity: 10,
     shadowRadius: 10,
+    elevation: 2,
     justifyContent: 'center',
-    marginVertical: 0, // Remover margem vertical
+    marginVertical: 60,
     borderWidth: 0,
     borderColor: '#00ff00',
-    alignSelf: 'center',
   },
   buttonText: {
-    fontSize: 15,
+    fontSize: 14,
     color: '#ffffff',
     fontWeight: 'bold',
     textAlign: 'center',
-    width: '43%',
+  },
+  watermark: {
+    position: 'absolute',
+    top: 30, // Posiciona a marca d'água no topo da tela
+    right: 10, // Posiciona a marca d'água à direita
+    fontSize: 12, // Tamanho da fonte da marca d'água
+    color: 'rgba(0, 0, 0, 0.2)', // Cor cinza claro com opacidade
   },
 });
 
-export default CadastroAluno;
+export default LoginHome;
