@@ -11,7 +11,7 @@ import Notificacoes from "../screens/Notificacoes";
 // Definindo as cores de forma centralizada
 const colors = {
   primaryGreen: '#359830',
-  activeRed: '#ff0000',
+  activeRed: '#7CFC00', // codigo da fonte e icons drawer #7CFC00
   white: '#ffffff',
 };
 
