@@ -1,7 +1,6 @@
-import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import { createDrawerNavigator } from "@react-navigation/drawer";
 import * as React from "react";
 import { Feather } from '@expo/vector-icons';
-
 import Perfil from "../screens/Perfil";
 import Grupo from "../screens/Grupo";
 import Ocorrencias from "../screens/Ocorrencias";
@@ -9,60 +8,76 @@ import Reunioes from "../screens/Reunioes";
 import Documentos from "../screens/Documento";
 import Notificacoes from "../screens/Notificacoes";
 
-const Tab = createBottomTabNavigator();
+// Definindo as cores de forma centralizada
+const colors = {
+  primaryGreen: '#359830',
+  activeRed: '#ff0000',
+  white: '#ffffff',
+};
 
-export default function TabRoutes() {
+// Função auxiliar para criar os ícones
+const DrawerIcon = (name: string, color: string) => (
+  <Feather name={name} size={24} color={color} />
+);
+
+const Drawer = createDrawerNavigator();
+
+export default function DrawerRoutes() {
   return (
-    <Tab.Navigator screenOptions={{ title: '' }}>
-      
-      <Tab.Screen  
-        name="Ocorrencias"
-        component={Ocorrencias}
-        options={{
-          tabBarIcon: () => <Feather name="alert-triangle" size={24} color="black" />
-        }}
-      />
-
-      <Tab.Screen 
-        name="Grupos" 
-        component={Grupo}
-        options={{
-          tabBarIcon: () => <Feather name="users" size={24} color="black" />
-        }}
-      />
-      
-      <Tab.Screen 
-        name="Documentos"
-        component={Documentos}
-        options={{
-          tabBarIcon: () => <Feather name="file-text" size={24} color="black" />
-        }}
-      />
-
-      <Tab.Screen 
-        name="Reunioes"
-        component={Reunioes}
-        options={{
-          tabBarIcon: () => <Feather name="calendar" size={24} color="black" />
-        }}
-      />
-
-      <Tab.Screen 
-        name="Notificacoes"
-        component={Notificacoes}
-        options={{
-          tabBarIcon: () => <Feather name="bell" size={24} color="black" />
-        }}
-      />
-
-      <Tab.Screen 
+    <Drawer.Navigator
+      screenOptions={{
+        headerShown: true, // Exibe o cabeçalho
+        headerStyle: { backgroundColor: colors.primaryGreen }, // Cabeçalho verde
+        headerTintColor: colors.white, // Título do cabeçalho em branco
+        headerTitleStyle: { fontWeight: 'bold' }, // Estilo do título (negrito)
+        drawerActiveTintColor: colors.activeRed, // Cor ativa do item no menu (vermelho)
+        drawerInactiveTintColor: colors.white, // Cor inativa do item no menu (branco)
+        drawerStyle: { backgroundColor: colors.primaryGreen }, // Fundo verde do drawer
+        drawerWidth: 240, // Largura do drawer (ajuste conforme necessário)
+      }}
+    >
+      <Drawer.Screen
         name="Perfil"
         component={Perfil}
         options={{
-          tabBarIcon: () => <Feather name="user" size={24} color="black" />
+          drawerIcon: ({ color }) => DrawerIcon("user", color),
         }}
       />
-      
-    </Tab.Navigator> 
+      <Drawer.Screen
+        name="Ocorrencias"
+        component={Ocorrencias}
+        options={{
+          drawerIcon: ({ color }) => DrawerIcon("alert-triangle", color),
+        }}
+      />
+      <Drawer.Screen
+        name="Grupos"
+        component={Grupo}
+        options={{
+          drawerIcon: ({ color }) => DrawerIcon("users", color),
+        }}
+      />
+      <Drawer.Screen
+        name="Documentos"
+        component={Documentos}
+        options={{
+          drawerIcon: ({ color }) => DrawerIcon("file-text", color),
+        }}
+      />
+      <Drawer.Screen
+        name="Reunioes"
+        component={Reunioes}
+        options={{
+          drawerIcon: ({ color }) => DrawerIcon("calendar", color),
+        }}
+      />
+      <Drawer.Screen
+        name="Notificacoes"
+        component={Notificacoes}
+        options={{
+          drawerIcon: ({ color }) => DrawerIcon("bell", color),
+        }}
+      />
+    </Drawer.Navigator>
   );
 }
