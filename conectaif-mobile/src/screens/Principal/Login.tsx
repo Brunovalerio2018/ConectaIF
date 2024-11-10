@@ -85,7 +85,7 @@ const fetchData = async () => {
       <Text style={styles.label1}>Usuário:</Text>
       <TextInput
         style={styles.input}
-        placeholder="Nome de usuário"
+        placeholder="  Nome de usuário"
         value={usuario}
         onChangeText={setUsuario}
       />
@@ -93,7 +93,7 @@ const fetchData = async () => {
       <Text style={styles.label2}>Senha:</Text>
       <TextInput
         style={styles.input}
-        placeholder="Digite sua senha"
+        placeholder="   Digite sua senha"
         secureTextEntry={!mostrarSenha}
         value={senha}
         onChangeText={setSenha}
@@ -162,14 +162,14 @@ const styles = StyleSheet.create({
     fontSize: 20,
     marginBottom: 0,
     borderTopLeftRadius: 20,
-    marginLeft: -229,
+    marginLeft: -210,
   },
   input: {
     borderWidth: 1,
     borderColor: '#ccc',
     padding: 3,
-    marginBottom: 2,
-    borderRadius: 10,
+    marginBottom: 13,
+    borderRadius: 20,
     backgroundColor: '#eaeaea',
     width: '100%', // Faz com que o campo de entrada ocupe toda a largura disponível
     maxWidth: 290, // Limita a largura máxima para manter a proporção
