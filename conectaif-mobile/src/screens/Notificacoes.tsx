@@ -5,7 +5,7 @@ import { StyleSheet, Text, View, FlatList, TouchableOpacity } from "react-native
 const fetchNotifications = async () => {
   try {
     // Substitua pela URL real da sua API
-    const response = await fetch("http://seu-servidor.com/api/notificacoes");
+    const response = await fetch("http://localhost:3335/docs#/notificacao");
     const data = await response.json();
     return data;  // Retorna as notificações
   } catch (error) {
